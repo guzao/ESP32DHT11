@@ -21,11 +21,22 @@ const char *mqtt_password = "xaOLytUEQI";
 const char *mqtt_username = "5mk5srrjyi245nf4";
 const char *mqtt_broker = "sh-3-mqtt.iot-api.com";
 
+/**
+ * WIFI 连接
+*/
 WiFiClient espClient;
 
+/**
+ * 客户端事件
+*/
+sensors_event_t event;
+
+
+/**
+ * 客户端事件
+*/
 PubSubClient client(espClient);
 
-sensors_event_t event;
 
 /**
  * 老的 温度
@@ -62,6 +73,9 @@ void publishMqttMesage();
  */
 void dataCollection();
 
+/**
+ * 初始化温度采集器
+*/
 DHT_Unified dht(DHTPIN, DHTTYPE);
 
 void setup()
@@ -141,6 +155,11 @@ void dataCollection()
 
 void publishMqttMesage()
 {
+  if (!client.connected())
+  {
+    Serial.println("数据重连");
+    connectingMqtt();
+  }
   Serial.println("publish");
   char msg[200];
   snprintf(
